@@ -2,12 +2,8 @@
 // Base URL for FPL API (uses CORS proxy for client-side access)
 
 const FPL_API = {
-    // CORS proxies to try (in order of preference)
-    CORS_PROXIES: [
-        'https://api.allorigins.win/raw?url=',
-        'https://corsproxy.io/?',
-        'https://api.codetabs.com/v1/proxy?quest='
-    ],
+    // AllOrigins proxy (most reliable for browser requests)
+    PROXY_URL: 'https://api.allorigins.win/get?url=',
     BASE_URL: 'https://fantasy.premierleague.com/api/',
 
     // Cached data
@@ -24,28 +20,24 @@ const FPL_API = {
         4: { short: 'FWD', full: 'Forward', class: 'position-fwd' }
     },
 
-    // Fetch with proxy fallback
-    async fetchWithProxy(url) {
-        let lastError;
+    // Fetch via CORS proxy
+    async fetchViaProxy(url) {
+        const proxyUrl = this.PROXY_URL + encodeURIComponent(url);
+        const response = await fetch(proxyUrl);
 
-        for (const proxy of this.CORS_PROXIES) {
-            try {
-                const proxyUrl = proxy + encodeURIComponent(url);
-                const response = await fetch(proxyUrl);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.warn(`Proxy ${proxy} failed:`, error.message);
-                lastError = error;
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        throw lastError || new Error('All proxies failed');
+        // AllOrigins wraps response in { contents: "..." }
+        const wrapper = await response.json();
+
+        if (!wrapper.contents) {
+            throw new Error('Empty response from proxy');
+        }
+
+        // Parse the contents string as JSON
+        return JSON.parse(wrapper.contents);
     },
 
     // Fetch bootstrap-static data (contains all player, team, and gameweek data)
@@ -59,7 +51,7 @@ const FPL_API = {
         }
 
         try {
-            const data = await this.fetchWithProxy(this.BASE_URL + 'bootstrap-static/');
+            const data = await this.fetchViaProxy(this.BASE_URL + 'bootstrap-static/');
 
             // Validate the data structure
             if (!data || !data.elements || !data.teams || !data.events) {
