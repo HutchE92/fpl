@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Helper - Fantasy Premier League Tips & Advice</title>
+    <meta name="description" content="Your ultimate Fantasy Premier League companion. Get the latest FPL tips, player picks, and Premier League news.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                ⚽ FPL <span>Helper</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="news.html">PL News</a></li>
+                <li><a href="fpl-news.html">FPL Updates</a></li>
+                <li><a href="picks.html">Picks & Advice</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Your <span>FPL</span> Companion</h1>
+        <p>Get the edge over your mini-league rivals with data-driven picks, latest news, and expert advice.</p>
+        <div class="hero-stats" id="hero-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-gw">--</div>
+                <div class="stat-label">Current Gameweek</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-players">--</div>
+                <div class="stat-label">Players Tracked</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-teams">20</div>
+                <div class="stat-label">PL Teams</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Quick Links -->
+        <section class="section-header">
+            <h2>🚀 Quick Access</h2>
+        </section>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">📰</div>
+                <h3>Premier League News</h3>
+                <p>Stay updated with the latest match reports, transfers, and Premier League headlines.</p>
+                <a href="news.html" class="card-link">View News →</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>FPL Updates</h3>
+                <p>Price changes, injury updates, and transfer trends to inform your decisions.</p>
+                <a href="fpl-news.html" class="card-link">View Updates →</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">⭐</div>
+                <h3>Picks & Advice</h3>
+                <p>Data-driven player recommendations, differentials, and captain picks.</p>
+                <a href="picks.html" class="card-link">View Picks →</a>
+            </div>
+        </div>
+
+        <!-- Featured Player -->
+        <section class="section-header">
+            <h2>🏆 Top Performers</h2>
+            <a href="picks.html">See all picks →</a>
+        </section>
+        <div id="top-performers">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading top performers...</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <section class="section-header mt-3">
+            <h2>📈 Quick Stats</h2>
+        </section>
+        <div class="card-grid">
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <h3>Most Transferred In</h3>
+                </div>
+                <div class="feature-card-body" id="transfers-in">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-card-header">
+                    <h3>Most Transferred Out</h3>
+                </div>
+                <div class="feature-card-body" id="transfers-out">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h4>FPL Helper</h4>
+                <p>Your companion for Fantasy Premier League success. Data sourced from the official FPL API.</p>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="news.html">PL News</a></li>
+                    <li><a href="fpl-news.html">FPL Updates</a></li>
+                    <li><a href="picks.html">Picks & Advice</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Official Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://fantasy.premierleague.com/" target="_blank" rel="noopener">Official FPL</a></li>
+                    <li><a href="https://www.premierleague.com/" target="_blank" rel="noopener">Premier League</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>This site is not affiliated with the Premier League or Fantasy Premier League. All data is sourced from public APIs.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', () => {
+            document.querySelector('.nav-links')?.classList.toggle('active');
+        });
+
+        // Load homepage data
+        async function loadHomepageData() {
+            try {
+                // Load gameweek info
+                const { current, next } = await FPL_API.getCurrentGameweek();
+                const activeGW = current || next;
+                if (activeGW) {
+                    document.getElementById('stat-gw').textContent = activeGW.id;
+                }
+
+                // Load player count
+                const data = await FPL_API.getBootstrapData();
+                document.getElementById('stat-players').textContent = data.elements.length;
+
+                // Load top performers
+                const topPlayers = await FPL_API.getTopPlayers(5);
+                const topContainer = document.getElementById('top-performers');
+                topContainer.innerHTML = `
+                    <div class="card-grid">
+                        ${topPlayers.map(p => `
+                            <div class="player-card">
+                                <span class="player-position ${FPL_API.positions[p.element_type].class}">
+                                    ${FPL_API.positions[p.element_type].short}
+                                </span>
+                                <div class="player-info">
+                                    <div class="player-name">${p.web_name}</div>
+                                    <div class="player-team">${data.teams.find(t => t.id === p.team)?.name || 'N/A'}</div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="player-points">${p.total_points} pts</div>
+                                    <div class="player-price">${FPL_API.formatPrice(p.now_cost)}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Load transfers in
+                const risers = await FPL_API.getPriceRisers(5);
+                document.getElementById('transfers-in').innerHTML = risers.map(p => `
+                    <div class="player-card mb-2">
+                        <span class="player-position ${FPL_API.positions[p.element_type].class}">
+                            ${FPL_API.positions[p.element_type].short}
+                        </span>
+                        <div class="player-info">
+                            <div class="player-name">${p.web_name}</div>
+                            <div class="player-team">${data.teams.find(t => t.id === p.team)?.short_name || 'N/A'}</div>
+                        </div>
+                        <div class="player-stats">
+                            <div class="player-points price-up">+${FPL_API.formatNumber(p.transfers_in_event)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Load transfers out
+                const fallers = await FPL_API.getPriceFallers(5);
+                document.getElementById('transfers-out').innerHTML = fallers.map(p => `
+                    <div class="player-card mb-2">
+                        <span class="player-position ${FPL_API.positions[p.element_type].class}">
+                            ${FPL_API.positions[p.element_type].short}
+                        </span>
+                        <div class="player-info">
+                            <div class="player-name">${p.web_name}</div>
+                            <div class="player-team">${data.teams.find(t => t.id === p.team)?.short_name || 'N/A'}</div>
+                        </div>
+                        <div class="player-stats">
+                            <div class="player-points price-down">-${FPL_API.formatNumber(p.transfers_out_event)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading homepage data:', error);
+                document.getElementById('top-performers').innerHTML = `
+                    <div class="error-message">
+                        Unable to load FPL data. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize
+        loadHomepageData();
+    </script>
+</body>
+</html>

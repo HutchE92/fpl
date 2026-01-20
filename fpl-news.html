@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Updates - FPL Helper</title>
+    <meta name="description" content="Fantasy Premier League updates including price changes, injury news, and transfer trends.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                ⚽ FPL <span>Helper</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="news.html">PL News</a></li>
+                <li><a href="fpl-news.html" class="active">FPL Updates</a></li>
+                <li><a href="picks.html">Picks & Advice</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="padding: 2rem;">
+        <h1>FPL <span>Updates</span></h1>
+        <p>Price changes, injuries, and transfer trends from the FPL API</p>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Gameweek Banner -->
+        <div class="gameweek-banner" id="gameweek-info">
+            <div class="gameweek-number">Loading...</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="injuries">Injury Updates</button>
+            <button class="tab-btn" data-tab="price-risers">Price Risers</button>
+            <button class="tab-btn" data-tab="price-fallers">Price Fallers</button>
+        </div>
+
+        <!-- Injuries Tab -->
+        <div class="tab-content active" id="injuries">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading injury updates...</p>
+            </div>
+        </div>
+
+        <!-- Price Risers Tab -->
+        <div class="tab-content" id="price-risers">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading price risers...</p>
+            </div>
+        </div>
+
+        <!-- Price Fallers Tab -->
+        <div class="tab-content" id="price-fallers">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading price fallers...</p>
+            </div>
+        </div>
+
+        <!-- FPL Resources -->
+        <section class="section-header mt-3">
+            <h2>🔗 FPL Resources</h2>
+        </section>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">📱</div>
+                <h3>Official FPL App</h3>
+                <p>Manage your team, make transfers, and track your rank on the official Fantasy Premier League platform.</p>
+                <a href="https://fantasy.premierleague.com/" target="_blank" rel="noopener" class="card-link">Go to FPL →</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">📋</div>
+                <h3>FPL Rules</h3>
+                <p>Learn about scoring, chips, wildcards, and all the rules of Fantasy Premier League.</p>
+                <a href="https://fantasy.premierleague.com/help/rules" target="_blank" rel="noopener" class="card-link">View Rules →</a>
+            </div>
+            <div class="card">
+                <div class="card-icon">📊</div>
+                <h3>FPL Statistics</h3>
+                <p>Dive deep into player statistics, form, and performance data on the official site.</p>
+                <a href="https://fantasy.premierleague.com/statistics" target="_blank" rel="noopener" class="card-link">View Stats →</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h4>FPL Helper</h4>
+                <p>Your companion for Fantasy Premier League success. Data sourced from the official FPL API.</p>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="news.html">PL News</a></li>
+                    <li><a href="fpl-news.html">FPL Updates</a></li>
+                    <li><a href="picks.html">Picks & Advice</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Official Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://fantasy.premierleague.com/" target="_blank" rel="noopener">Official FPL</a></li>
+                    <li><a href="https://www.premierleague.com/" target="_blank" rel="noopener">Premier League</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>This site is not affiliated with the Premier League or Fantasy Premier League. All data is sourced from public APIs.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // FPL News Page Manager
+        const FPLNewsManager = {
+            async init() {
+                this.setupMobileMenu();
+                this.setupTabs();
+                await this.loadAllData();
+            },
+
+            setupMobileMenu() {
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+                const navLinks = document.querySelector('.nav-links');
+
+                if (menuBtn && navLinks) {
+                    menuBtn.addEventListener('click', () => {
+                        navLinks.classList.toggle('active');
+                    });
+                }
+            },
+
+            setupTabs() {
+                const tabBtns = document.querySelectorAll('.tab-btn');
+                const tabContents = document.querySelectorAll('.tab-content');
+
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tabId = btn.dataset.tab;
+
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+
+                        btn.classList.add('active');
+                        document.getElementById(tabId)?.classList.add('active');
+                    });
+                });
+            },
+
+            async loadAllData() {
+                try {
+                    await this.loadGameweekInfo();
+                    await Promise.all([
+                        this.loadInjuries(),
+                        this.loadPriceRisers(),
+                        this.loadPriceFallers()
+                    ]);
+                } catch (error) {
+                    console.error('Error loading FPL data:', error);
+                }
+            },
+
+            async loadGameweekInfo() {
+                const gwInfo = document.getElementById('gameweek-info');
+                if (!gwInfo) return;
+
+                try {
+                    const { current, next } = await FPL_API.getCurrentGameweek();
+                    const activeGW = current || next;
+
+                    if (activeGW) {
+                        const deadline = new Date(activeGW.deadline_time);
+                        const deadlineStr = deadline.toLocaleDateString('en-GB', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        gwInfo.innerHTML = `
+                            <div class="gameweek-number">
+                                Gameweek <span>${activeGW.id}</span>
+                            </div>
+                            <div class="gameweek-deadline">
+                                <div class="deadline-label">${activeGW.is_current ? 'Deadline passed' : 'Next Deadline'}</div>
+                                <div class="deadline-time">${deadlineStr}</div>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    gwInfo.innerHTML = '<div class="gameweek-number">Gameweek Info Unavailable</div>';
+                }
+            },
+
+            async loadInjuries() {
+                const container = document.getElementById('injuries');
+                if (!container) return;
+
+                try {
+                    const players = await FPL_API.getInjuredPlayers();
+                    const data = await FPL_API.getBootstrapData();
+
+                    if (players.length === 0) {
+                        container.innerHTML = '<div class="card"><p>No injury updates at this time.</p></div>';
+                        return;
+                    }
+
+                    container.innerHTML = `
+                        <div class="card mb-2">
+                            <p style="color: var(--gray-600);">Players with availability concerns. Check the news column for specific injury details.</p>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Chance</th>
+                                    <th>News</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${players.slice(0, 30).map(p => `
+                                    <tr>
+                                        <td>
+                                            <div class="injury-status">
+                                                <span class="status-dot ${FPL_API.getStatusClass(p.chance_of_playing_next_round)}"></span>
+                                                <strong>${p.web_name}</strong>
+                                            </div>
+                                        </td>
+                                        <td>${data.teams.find(t => t.id === p.team)?.short_name || 'N/A'}</td>
+                                        <td>
+                                            <span class="badge ${p.chance_of_playing_next_round >= 75 ? 'badge-warning' : 'badge-danger'}">
+                                                ${p.chance_of_playing_next_round}%
+                                            </span>
+                                        </td>
+                                        <td style="max-width: 300px; font-size: 0.85rem;">${p.news || 'No details'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } catch (error) {
+                    container.innerHTML = '<div class="error-message">Unable to load injury data.</div>';
+                }
+            },
+
+            async loadPriceRisers() {
+                const container = document.getElementById('price-risers');
+                if (!container) return;
+
+                try {
+                    const players = await FPL_API.getPriceRisers(20);
+                    const data = await FPL_API.getBootstrapData();
+
+                    container.innerHTML = `
+                        <div class="card mb-2">
+                            <p style="color: var(--gray-600);">Players with the most transfers in this gameweek. High transfer activity may indicate a price rise.</p>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Price</th>
+                                    <th>Transfers In</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${players.map(p => `
+                                    <tr>
+                                        <td><strong>${p.web_name}</strong></td>
+                                        <td>${data.teams.find(t => t.id === p.team)?.short_name || 'N/A'}</td>
+                                        <td>${FPL_API.formatPrice(p.now_cost)}</td>
+                                        <td class="price-up">+${FPL_API.formatNumber(p.transfers_in_event)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } catch (error) {
+                    container.innerHTML = '<div class="error-message">Unable to load transfer data.</div>';
+                }
+            },
+
+            async loadPriceFallers() {
+                const container = document.getElementById('price-fallers');
+                if (!container) return;
+
+                try {
+                    const players = await FPL_API.getPriceFallers(20);
+                    const data = await FPL_API.getBootstrapData();
+
+                    container.innerHTML = `
+                        <div class="card mb-2">
+                            <p style="color: var(--gray-600);">Players with the most transfers out this gameweek. High outgoing transfers may indicate a price fall.</p>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Team</th>
+                                    <th>Price</th>
+                                    <th>Transfers Out</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${players.map(p => `
+                                    <tr>
+                                        <td><strong>${p.web_name}</strong></td>
+                                        <td>${data.teams.find(t => t.id === p.team)?.short_name || 'N/A'}</td>
+                                        <td>${FPL_API.formatPrice(p.now_cost)}</td>
+                                        <td class="price-down">-${FPL_API.formatNumber(p.transfers_out_event)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } catch (error) {
+                    container.innerHTML = '<div class="error-message">Unable to load transfer data.</div>';
+                }
+            }
+        };
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            FPLNewsManager.init();
+        });
+    </script>
+</body>
+</html>

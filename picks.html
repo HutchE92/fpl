@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picks & Advice - FPL Helper</title>
+    <meta name="description" content="Data-driven FPL picks, captain recommendations, differentials, and value players.">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                ⚽ FPL <span>Helper</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="news.html">PL News</a></li>
+                <li><a href="fpl-news.html">FPL Updates</a></li>
+                <li><a href="picks.html" class="active">Picks & Advice</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" style="padding: 2rem;">
+        <h1>Picks & <span>Advice</span></h1>
+        <p>Data-driven player recommendations powered by the official FPL API</p>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Gameweek Banner -->
+        <div class="gameweek-banner" id="gameweek-info">
+            <div class="gameweek-number">Loading...</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="top-picks">Top Picks</button>
+            <button class="tab-btn" data-tab="value-picks">Value Picks</button>
+            <button class="tab-btn" data-tab="differentials">Differentials</button>
+            <button class="tab-btn" data-tab="captain-picks">Captain Picks</button>
+        </div>
+
+        <!-- Top Picks Tab -->
+        <div class="tab-content active" id="top-picks">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading top picks...</p>
+            </div>
+        </div>
+
+        <!-- Value Picks Tab -->
+        <div class="tab-content" id="value-picks">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading value picks...</p>
+            </div>
+        </div>
+
+        <!-- Differentials Tab -->
+        <div class="tab-content" id="differentials">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading differentials...</p>
+            </div>
+        </div>
+
+        <!-- Captain Picks Tab -->
+        <div class="tab-content" id="captain-picks">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading captain picks...</p>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <section class="section-header mt-3">
+            <h2>💡 Quick Tips</h2>
+        </section>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Form vs Fixtures</h3>
+                <p>Balance in-form players with those who have favorable upcoming fixtures. Check the fixture difficulty before making transfers.</p>
+            </div>
+            <div class="card">
+                <h3>Price Changes</h3>
+                <p>Make early transfers if a player's price is about to rise. But remember, holding transfers gives you more flexibility.</p>
+            </div>
+            <div class="card">
+                <h3>Chip Strategy</h3>
+                <p>Save your Bench Boost for double gameweeks. Use your Wildcard when you need to make 4+ transfers.</p>
+            </div>
+            <div class="card">
+                <h3>Captain Choice</h3>
+                <p>Your captain scores double points. Pick players with good form, favorable fixtures, and high goal involvement.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div>
+                <h4>FPL Helper</h4>
+                <p>Your companion for Fantasy Premier League success. Data sourced from the official FPL API.</p>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="news.html">PL News</a></li>
+                    <li><a href="fpl-news.html">FPL Updates</a></li>
+                    <li><a href="picks.html">Picks & Advice</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Official Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="https://fantasy.premierleague.com/" target="_blank" rel="noopener">Official FPL</a></li>
+                    <li><a href="https://www.premierleague.com/" target="_blank" rel="noopener">Premier League</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>This site is not affiliated with the Premier League or Fantasy Premier League. All data is sourced from public APIs.</p>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/picks.js"></script>
+</body>
+</html>
