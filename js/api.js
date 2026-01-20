@@ -2,8 +2,12 @@
 // Base URL for FPL API (uses CORS proxy for client-side access)
 
 const FPL_API = {
-    // We need a CORS proxy since the FPL API doesn't allow direct browser requests
-    CORS_PROXY: 'https://corsproxy.io/?',
+    // CORS proxies to try (in order of preference)
+    CORS_PROXIES: [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?',
+        'https://api.codetabs.com/v1/proxy?quest='
+    ],
     BASE_URL: 'https://fantasy.premierleague.com/api/',
 
     // Cached data
@@ -20,6 +24,30 @@ const FPL_API = {
         4: { short: 'FWD', full: 'Forward', class: 'position-fwd' }
     },
 
+    // Fetch with proxy fallback
+    async fetchWithProxy(url) {
+        let lastError;
+
+        for (const proxy of this.CORS_PROXIES) {
+            try {
+                const proxyUrl = proxy + encodeURIComponent(url);
+                const response = await fetch(proxyUrl);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.warn(`Proxy ${proxy} failed:`, error.message);
+                lastError = error;
+            }
+        }
+
+        throw lastError || new Error('All proxies failed');
+    },
+
     // Fetch bootstrap-static data (contains all player, team, and gameweek data)
     async getBootstrapData() {
         // Return cached data if less than 5 minutes old
@@ -31,15 +59,12 @@ const FPL_API = {
         }
 
         try {
-            const response = await fetch(
-                `${this.CORS_PROXY}${encodeURIComponent(this.BASE_URL + 'bootstrap-static/')}`
-            );
+            const data = await this.fetchWithProxy(this.BASE_URL + 'bootstrap-static/');
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Validate the data structure
+            if (!data || !data.elements || !data.teams || !data.events) {
+                throw new Error('Invalid data structure received from FPL API');
             }
-
-            const data = await response.json();
 
             // Cache the data
             this.cache.bootstrap = data;
